@@ -5,4 +5,8 @@ cd OF_ROOT/apps/myApps/YourAppName/
 
 git clone https://github.com/sharesynth/of-particle-system.git
 
-delete old src file and rename newly cloned repo to src
+rm -r src
+
+mv of-particle-system src
+
+open OF Project Generator to update then open in IDE

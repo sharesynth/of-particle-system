@@ -10,7 +10,7 @@
 #define Particle_hpp
 
 #include "ofMain.h"
-#include "Params.hpp"
+#include "Emitter.hpp"
 
 class Particle{
 public:
@@ -19,10 +19,10 @@ public:
     float time; // Time of living
     float lifeTime; // Allowed lifetime
     bool live;
-    void setup(Params param); // Start particle
-    void update( float dt ); // Recalculate physics
+    void setup(Emitter param); // Start particle
+    void update(float dt, Emitter param); // Recalculate physics
     void draw(); // Draw particle
-    ofPoint randomPointInCircle( float maxRad );
+    ofPoint randomPointInCircle(float maxRad);
 };
 
 #endif /* Particle_hpp */

@@ -1,17 +1,17 @@
 //
-//  Params.hpp
+//  Emitter.hpp
 //  ParticleSystem
 //
-//  Created by Jeremy Sykes on 2017-05-22.
+//  Created by Jeremy Sykes on 2017-05-23.
 //
 //
 
-#ifndef Params_hpp
-#define Params_hpp
+#ifndef Emitter_hpp
+#define Emitter_hpp
 
 #include "ofMain.h"
 
-class Params{
+class Emitter{
 public:
     void setup();
     ofPoint eCenter; // Emitter center
@@ -24,6 +24,4 @@ public:
     float friction; // Friction, in the range [0, 1]
 };
 
-extern Params param; // Declaration of a global variable
-
-#endif /* Params_hpp */
+#endif /* Emitter_hpp */

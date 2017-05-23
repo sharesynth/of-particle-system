@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "Particle.hpp"
 #include "Interface.hpp"
+#include "Emitter.hpp"
 
 class ofApp : public ofBaseApp{
 public:
@@ -26,4 +27,5 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+    Emitter emitter;
 };

@@ -1,14 +1,14 @@
 //
-//  Params.cpp
+//  Emitter.cpp
 //  ParticleSystem
 //
-//  Created by Jeremy Sykes on 2017-05-22.
+//  Created by Jeremy Sykes on 2017-05-23.
 //
 //
 
-#include "Params.hpp"
+#include "Emitter.hpp"
 
-void Params::setup() {
+void Emitter::setup() {
     eCenter = ofPoint( ofGetWidth() / 2, ofGetHeight() / 2 );
     eRad = 100;
     velRad = 0;

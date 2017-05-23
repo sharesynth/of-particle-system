@@ -8,33 +8,33 @@
 
 #include "Particle.hpp"
 
-void Particle::setup(Params param) {
-    pos = param.eCenter + randomPointInCircle( param.eRad );
-    vel = randomPointInCircle( param.velRad );
+void Particle::setup(Emitter emitter) {
+    pos = emitter.eCenter + randomPointInCircle(emitter.eRad);
+    vel = randomPointInCircle(emitter.velRad);
     time = 0;
-    lifeTime = param.lifeTime;
-    live = true; // true;
+    lifeTime = emitter.lifeTime;
+    live = true;
 }
 
-void Particle::update(float dt){
+void Particle::update(float dt, Emitter emitter){
     if (live) {
         
-        vel.rotate(0, 0, param.rotate * dt);
+        vel.rotate(0, 0, emitter.rotate * dt);
         
         ofPoint acc;
-        ofPoint delta = pos - param.eCenter;
+        ofPoint delta = pos - emitter.eCenter;
         float len = delta.length();
-        if (ofInRange(len, 0, param.eRad)) {
+        if (ofInRange(len, 0, emitter.eRad)) {
             delta.normalize();
             
-            acc += delta * param.force;
+            acc += delta * emitter.force;
             
-            acc.x += -delta.y * param.spinning;
-            acc.y += delta.x * param.spinning;
+            acc.x += -delta.y * emitter.spinning;
+            acc.y += delta.x * emitter.spinning;
         }
         
         vel += acc * dt;
-        vel *= (1 - param.friction);
+        vel *= (1 - emitter.friction);
         pos += vel * dt;
         time += dt;
         
@@ -47,12 +47,11 @@ void Particle::update(float dt){
 void Particle::draw(){
     if ( live ) {
         float size = ofMap(fabs(time - lifeTime * 0.5), 0, lifeTime * 0.5, 3, 1);
-
-        ofColor color = ofColor::red;
         float hue = ofMap(time, 0, lifeTime, 128, 255);
+        
+        ofColor color = ofColor::red;
         color.setHue(hue);
         ofSetColor(color);
-        
         ofDrawCircle(pos, size);
     }
 }

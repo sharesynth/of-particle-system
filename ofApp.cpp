@@ -25,8 +25,8 @@ void ofApp::setup(){
     interf.addSlider("rate", &bornRate, 0, 3000);
     interf.addSlider("lifeTime", &emitter.lifeTime, 0, 5);
     interf.addSlider("history", &history, 0, 1);
-    interf.addSlider("eRad", &emitter.eRad, 0, 800);
-    interf.addSlider("velRad", &emitter.velRad, 0, 400);
+    interf.addSlider("E. Radius", &emitter.radius, 0, 800);
+    interf.addSlider("Vel. Limit", &emitter.velocityLimit, 0, 400);
     interf.addSlider("rotate", &emitter.rotate, -500, 500);
     interf.addSlider("spinning", &emitter.spinning, -1000, 1000);
     interf.addSlider("force", &emitter.force, -1000, 1000);
@@ -38,24 +38,23 @@ void ofApp::setup(){
 void ofApp::update(){
     // Compute dt
     float time = ofGetElapsedTimef();
-    float dt = ofClamp( time - time0, 0, 0.1 );
+    float dt = ofClamp(time - time0, 0, 0.1);
     time0 = time;
     
     // Delete inactive particles
-    int i=0;
+    int i = 0;
     while (i < p.size()) {
-        if ( !p[i].live ) {
-            p.erase( p.begin() + i );
-        }
-        else {
+        if (!p[i].live) {
+            p.erase(p.begin() + i);
+        } else {
             i++;
         }
     }
     
     // Born new particles
     bornCount += dt * bornRate; // Update bornCount value
-    if ( bornCount >= 1 ) { // It's time to born particle(s)
-        int bornN = int( bornCount ); // How many born
+    if (bornCount >= 1) { // It's time to born particle(s)
+        int bornN = int(bornCount); // How many born
         bornCount -= bornN; // Correct bornCount value
         for (int i=0; i<bornN; i++) {
             Particle newP;
@@ -65,7 +64,7 @@ void ofApp::update(){
     }
 
     // Update the particles
-    for (int i=0; i<p.size(); i++) {
+    for (int i = 0; i < p.size(); i++) {
         p[i].update(dt, emitter);
     }
 }
@@ -109,7 +108,7 @@ void ofApp::draw(){
         ofSetCircleResolution(50);
         ofNoFill();
         ofSetColor(128, 128, 128);
-        ofDrawCircle( emitter.eCenter, emitter.eRad );
+        ofDrawCircle( emitter.eCenter, emitter.radius );
         ofSetCircleResolution(20);
     }
 }

@@ -14,8 +14,8 @@
 
 class Particle{
 public:
-    ofPoint pos; // Position
-    ofPoint vel; // Velocity
+    ofPoint position;
+    ofPoint velocity;
     float time; // Time of living
     float lifeTime; // Allowed lifetime
     bool live;

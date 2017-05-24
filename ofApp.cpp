@@ -3,24 +3,28 @@
 
 void ofApp::setup(){
     ofSetFrameRate(60);
-    
-    // Allocate drawing buffer
-    int w = ofGetWidth();
-    int h = ofGetHeight();
-    fbo.allocate(w, h, GL_RGB32F_ARB);
-    
-    // Fill buffer with white color
+    initializeVariables();
+    setupDrawingBuffer();
+    emitter.setup();
+    setupGui();
+}
+
+void ofApp::setupDrawingBuffer() {
+    fbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB32F_ARB);
     fbo.begin();
     ofBackground(255, 255, 255);
     fbo.end();
-    
-    emitter.setup();
-    
+}
+
+void ofApp::initializeVariables() {
+    drawInterface = true;
     history = 0.9;
     bornRate = 1500;
     bornCount = 0;
     time0 = ofGetElapsedTimef();
-    
+}
+
+void ofApp::setupGui(){
     interf.setup();
     interf.addSlider("rate", &bornRate, 0, 3000);
     interf.addSlider("lifeTime", &emitter.lifeTime, 0, 5);
@@ -31,17 +35,9 @@ void ofApp::setup(){
     interf.addSlider("spinning", &emitter.spinning, -1000, 1000);
     interf.addSlider("force", &emitter.force, -1000, 1000);
     interf.addSlider("friction", &emitter.friction, 0, 0.1);
-    
-    drawInterface = true;
 }
 
-void ofApp::update(){
-    // Compute dt
-    float time = ofGetElapsedTimef();
-    float dt = ofClamp(time - time0, 0, 0.1);
-    time0 = time;
-    
-    // Delete inactive particles
+void ofApp::deleteInactiveParticles() {
     int i = 0;
     while (i < p.size()) {
         if (!p[i].live) {
@@ -50,67 +46,93 @@ void ofApp::update(){
             i++;
         }
     }
-    
-    // Born new particles
-    bornCount += dt * bornRate; // Update bornCount value
-    if (bornCount >= 1) { // It's time to born particle(s)
-        int bornN = int(bornCount); // How many born
-        bornCount -= bornN; // Correct bornCount value
-        for (int i=0; i<bornN; i++) {
-            Particle newP;
-            newP.setup(emitter); // Start a new particle
-            p.push_back(newP); // Add this particle to array
-        }
-    }
+}
 
-    // Update the particles
+float ofApp::computeDeltaTime() {
+    float time = ofGetElapsedTimef();
+    float dt = ofClamp(time - time0, 0, 0.1);
+    time0 = time;
+    return dt;
+}
+
+void ofApp::updateParticles(float dt) {
     for (int i = 0; i < p.size(); i++) {
         p[i].update(dt, emitter);
     }
 }
 
+void ofApp::addNewParticles(float dt) {
+    bornCount += dt * bornRate;
+    if (bornCount >= 1) {
+        int bornN = int(bornCount);
+        bornCount -= bornN;
+        for (int i = 0; i < bornN; i++) {
+            Particle newP;
+            newP.setup(emitter);
+            p.push_back(newP);
+        }
+    }
+}
+
+void ofApp::update(){
+    deleteInactiveParticles();
+    float dt = computeDeltaTime();
+    addNewParticles(dt);
+    updateParticles(dt);
+}
+
 void ofApp::draw(){
-    
     ofBackground(255, 255, 255);
+    drawParticles();
+    ofSetColor(255, 255, 255);
+    fbo.draw(0, 0);
+    if (drawInterface) {
+        drawInstructions();
+        interf.draw();
+        drawEmitterRadius();
+    }
+}
+
+void ofApp::drawParticles() {
     
     fbo.begin();
-    
     ofEnableAlphaBlending();
-    
     float alpha = (1 - history) * 255;
     ofSetColor(255, 255, 255, alpha);
     ofFill();
     ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
-    
     ofDisableAlphaBlending();
-    
     ofFill();
+    
     for (int i = 0; i < p.size(); i++) {
         p[i].draw();
     }
     
     fbo.end();
-    
-    ofSetColor(255, 255, 255);
-    fbo.draw(0, 0);
-    
-    if (drawInterface) {
-        
-        string controlMessage = "Keys: Enter-toggle GUI, Space-screenshot, 1,2,...,9-load preset, Shift+1,2,...9-save preset";
-        string particleMessage = "Particles: " + ofToString( p.size());
-        
-        ofSetColor(0, 0, 0);
-        ofDrawBitmapString(controlMessage, 20, 20);
-        ofDrawBitmapString(particleMessage, 20, 40);
-        
-        interf.draw();
-        
-        ofSetCircleResolution(50);
-        ofNoFill();
-        ofSetColor(128, 128, 128);
-        ofDrawCircle( emitter.eCenter, emitter.radius );
-        ofSetCircleResolution(20);
-    }
+}
+
+void ofApp::drawInstructions() {
+    string controlMessage = "Keys: Enter-toggle GUI, Space-screenshot, 1,2,...,9-load preset, Shift+1,2,...9-save preset";
+    string particleMessage = "Particles: " + ofToString( p.size());
+    ofSetColor(0, 0, 0);
+    ofDrawBitmapString(controlMessage, 20, 20);
+    ofDrawBitmapString(particleMessage, 20, 40);
+}
+
+void ofApp::drawEmitterRadius() {
+    ofSetCircleResolution(50);
+    ofNoFill();
+    ofSetColor(128, 128, 128);
+    ofDrawCircle(emitter.eCenter, emitter.radius);
+    ofSetCircleResolution(20);
+}
+
+void ofApp::saveRandomScreenshot() {
+    ofImage image;
+    image.grabScreen(0, 0, ofGetWidth(), ofGetHeight());
+    int n = ofRandom(0, 1000);
+    string fileName = "screen" + ofToString( n ) + ".png";
+    image.save(fileName);
 }
 
 void ofApp::keyPressed(int key){
@@ -119,15 +141,9 @@ void ofApp::keyPressed(int key){
     }
     
     if (key == ' ') {
-        ofImage image;
-        image.grabScreen( 0, 0, ofGetWidth(), ofGetHeight() );
-        
-        int n = ofRandom( 0, 1000 );
-        string fileName = "screen" + ofToString( n ) + ".png";
-        
-        image.save( fileName );
+        saveRandomScreenshot();
     }
-    
+
     if (key == '1') {
         interf.load(1);
     }

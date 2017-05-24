@@ -27,5 +27,16 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+    void drawParticles();
+    void drawEmitterRadius();
+    void drawInstructions();
+    void saveRandomScreenshot();
+    float computeDeltaTime();
+    void addNewParticles(float dt);
+    void updateParticles(float dt);
+    void deleteInactiveParticles();
+    void setupDrawingBuffer();
+    void initializeVariables();
+    void setupGui();
     Emitter emitter;
 };
